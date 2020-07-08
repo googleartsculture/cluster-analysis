@@ -1,0 +1,48 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+node_modules
+dist
+dist-oss
+env
+src/.coverage
+src/test/coverage
+src/secrets.py
+Dockerfile
+
+# C extensions
+*.so
+*.swp
+*~
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+docs/_build/
+
+# GAE
+*.datastore
+*.datastore.*
+
+# MAC OSX
+.DS_Store
+
+# Eclipse
+.project
+.pydevproject
+.settings
+
+# Netbeans
+nbproject
+
+# SVN
+.svn*
+
+# Idea
+.idea/workspace.xml
+.idea/tasks.xml
+
+# VSCODE
+.vscode/
