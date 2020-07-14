@@ -1,8 +1,9 @@
-# Cluster Analysis
+# Fabricius Workbench Cluster Analysis API
 
 Extraction of an ordered sequence of candidate hieroglyphs from an image or facsimile.
 
-This API is required by the Google Arts and Culture Fabricius Workbench, code found at [googleartsculture/workbench](https://github.com/googleartsculture/workbench)
+This API is required by the Google Arts and Culture Fabricius Workbench,
+code found at [googleartsculture/workbench](https://github.com/googleartsculture/workbench). For more infomation go to the [Google Arts and Culture home page](https://experiments.withgoogle.com/fabricius) for the project.
 
 ## Contributing
 
