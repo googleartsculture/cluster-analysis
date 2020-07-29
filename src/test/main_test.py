@@ -263,3 +263,11 @@ class MainTests(TestbedTestCase):
             self.assertIn('y', cluster.get('bounds'))
             self.assertIn('height', cluster.get('bounds'))
             self.assertIn('width', cluster.get('bounds'))
+
+
+    def test_warmup_request_responds_200(self):
+        """
+        Asserts that a reuqest to /_ah/warmup is handled.
+        """
+        response = self.client.get('/_ah/warmup')
+        self.assertEqual('200 OK', response.status)

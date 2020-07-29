@@ -115,6 +115,7 @@ def require_json(params=None):
     any of them are missing.'''
     if params is None:
         params = []
+
     def require_json_inner(func):
         @wraps(func)
         def func_wrapper(*args, **kwargs):
@@ -153,14 +154,12 @@ def do_cluster_analysis(image, direction, dbscan_threshold=160):
     if len(pixels) == 0:
         raise BadRequest(
             'No pixels within the threshold range, please try a higher' +
-            ' contrast image.'
-        )
+            ' contrast image.')
 
     if len(pixels) >= pixel_limit:
         raise BadRequest(
-            'Pixel limit of {} was exceeded. Please refine the edge detection' +
-            ' or use a smaller segment.'
-            .format(pixel_limit))
+            'Pixel limit of {} was exceeded. Please refine the edge detection'
+            + ' or use a smaller segment.'.format(pixel_limit))
 
     # Do the clustering on our thresholded pixel coordinates then
     # check to see if we have found any clusters
@@ -711,6 +710,11 @@ def serialize_job_dictionary(job_dict):
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.route('/_ah/warmup')
+def warmup():
+    return '', 200, {}
 
 
 @app.route('/clusteranalysis', methods=['POST'])
