@@ -15,6 +15,7 @@
 # limitations under the License.
 
 from test.utils import TestbedTestCase
+import os
 import json
 import main
 
@@ -242,6 +243,21 @@ class MainTests(TestbedTestCase):
         self.assertEqual(400, data.get('code'))
         self.assertEqual("Invalid read order 'invalid'", data.get('message'))
 
+    def test_invalid_request_with_plain_image(self):
+        json_path = os.path.join(os.path.dirname(__file__),
+                                'invalid_request.json')
+        invalid = open(json_path)
+        payload = json.load(invalid)
+        response = self.client.post('/clusteranalysis', json=payload)
+        self.assertEqual('400 BAD REQUEST', response.status)
+        data = json.loads(response.data)
+        self.assertEqual(400, data.get('code'))
+        # This is specific to the particular error in the payload but does
+        # test that the correct message is returned to the user.
+        self.assertEqual(
+            "No pixels within the threshold range, please try a higher contrast image.",
+            data.get('message'))
+
     def test_valid_clusteranalysis_requests(self):
         response = self.client.post('/clusteranalysis',
                                     json={'image': VALID_PNG_IMAGE_DATA})
@@ -263,7 +279,6 @@ class MainTests(TestbedTestCase):
             self.assertIn('y', cluster.get('bounds'))
             self.assertIn('height', cluster.get('bounds'))
             self.assertIn('width', cluster.get('bounds'))
-
 
     def test_warmup_request_responds_200(self):
         """
