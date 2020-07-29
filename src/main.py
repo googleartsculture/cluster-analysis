@@ -36,6 +36,7 @@ from werkzeug.exceptions import (BadRequest, Forbidden, HTTPException,
 
 from models.polygon import Polygon
 
+
 # Define which port to run on.
 PORT = os.environ.get('CLUSTER_SERVICE_PORT', '8080')
 
@@ -56,8 +57,7 @@ dbscan_min_samples = 3
 cartouche_min_glyph_count = 4
 
 
-# Define a new get_headers() function for the HTTPException class,
-# to return application/json MIME type rather than plain HTML
+# Define a new get_headers() function for the HTTPException class, to return application/json MIME type rather than plain HTML
 # @TODO Review how this is being done and implement in a more pythoninc way
 def get_headers(self, environ=None):
     return [('Content-Type', 'application/json')]
@@ -66,8 +66,7 @@ def get_headers(self, environ=None):
 HTTPException.get_headers = get_headers
 
 
-# Define a new get_body() function for the HTTPException class,
-# to return json rather than plain HTML
+# Define a new get_body() function for the HTTPException class, to return json rather than plain HTML
 # @TODO Review how this is being done and implement in a more pythoninc way
 def get_body(self, environ=None):
     return json.dumps({
@@ -78,7 +77,6 @@ def get_body(self, environ=None):
 
 
 HTTPException.get_body = get_body
-
 
 def get_buffered_points(points, centroid=None, factor=2.0):
     """
@@ -115,7 +113,6 @@ def require_json(params=None):
     any of them are missing.'''
     if params is None:
         params = []
-
     def require_json_inner(func):
         @wraps(func)
         def func_wrapper(*args, **kwargs):
@@ -153,13 +150,13 @@ def do_cluster_analysis(image, direction, dbscan_threshold=160):
                                                     threshold=dbscan_threshold)
     if len(pixels) == 0:
         raise BadRequest(
-            'No pixels within the threshold range, please try a higher' +
-            ' contrast image.')
+            'No pixels within the threshold range, please try a higher contrast image.'
+        )
 
     if len(pixels) >= pixel_limit:
         raise BadRequest(
-            'Pixel limit of {} was exceeded. Please refine the edge detection'
-            + ' or use a smaller segment.'.format(pixel_limit))
+            'Pixel limit of {} was exceeded. Please refine the edge detection or use a smaller segment.'
+            .format(pixel_limit))
 
     # Do the clustering on our thresholded pixel coordinates then
     # check to see if we have found any clusters
@@ -237,12 +234,15 @@ def do_cluster_analysis(image, direction, dbscan_threshold=160):
             'hull': cluster_vertices,
             'bounds': bounds
         })
-
+        #response['clusters'].append({'cluster_id': sequence_key, 'raw': raw, 'processed': processed, 'bounds': bounds})
     return response
-
 
 def get_source_image_pixels(image, threshold=160, invert=False):
     imagePixels = image.load()
+    #imagePixels = im.load()
+    #print ("Image width and height:", im.size)
+    #print ("Number of pixels in image:",im.size[0] * im.size[1])
+
     # Convert the RGB image array to a set of gray scale
     # pixel coordinates over a certain threshold
     # These pixel cooordinates define the feature space
@@ -426,9 +426,7 @@ def merge(job_dict, merge_dict, cartouche_list):
     param merge_dict: A dictionary defining clusters
     param cartouche_list: A list of cartouche dictionaries
     """
-
-    # Build a list of cartouche wrappers and frames so
-    # we don't merge cartouche inner clusters with their frames
+    # Build a list of cartouche wrappers and frames so we don't merge cartouche inner clusters with their frames
     cartouche_clusters = []
     for c in cartouche_list:
         cartouche_clusters = cartouche_clusters + c['wrapper']
@@ -438,14 +436,11 @@ def merge(job_dict, merge_dict, cartouche_list):
     for outer in merge_dict:
         if outer not in cartouche_clusters:
             for inner in merge_dict[outer]:
-                # We may have already processed our raw clusters so
-                # want to avoid a key error
+                # We may have already processed our raw clusters so want to avoid a key error
                 if outer in job_dict[
                         'clusters_processed'] and inner in job_dict[
                             'clusters_processed']:
-                    # Merge the 2 clusters and label with
-                    # the name of the outer cluster then delete
-                    # the inner cluster
+                    # Merge the 2 clusters and label with the name of the outer cluster then delete the inner cluster
                     job_dict['clusters_processed'][outer] = merge_clusters(
                         job_dict['clusters_processed'][inner],
                         job_dict['clusters_processed'][outer])
@@ -487,15 +482,12 @@ def set_groups_and_sequence(job_dict, labels_axis=0, direction='ltr'):
     # Iterate the labels list
     for i in range(1, len(label_lists)):
         if any(label in label_lists[i] for label in label_lists[i - 1]):
-            # If the current label list shares any labels with
-            # the previous labels list then add
-            # these labels to our group if they aren't already
-            # in the group
+            # If the current label list shares any labels with the previous labels list then add
+            # these labels to our group if they aren't already in the group
             g = g + list(set(label_lists[i]) - set(g))
             g = g + list(set(label_lists[i - 1]) - set(g))
         else:
-            # We crossed a group boundary so add the group we've being building
-            # to the groups list
+            # We crossed a group boundary so add the group we've being building to the groups list
             if len(g) > 0:
                 # Sort within a group
                 groups.append(order_group(g, box_dict, direction))
@@ -587,8 +579,7 @@ def get_labels(clusters_dict, labels_of_interest=[], axis=0, direction='ltr'):
             step = -1
     else:
         # y-axis labelling because we have a column and we always read from top
-        # If we have a read-order of vrtl we sort by reversed
-        # x values within groups
+        # If we have a read-order of vrtl we sort by reversed x values within groups
         box_min_index = 1
         box_max_index = 3
     d = {}
@@ -600,10 +591,8 @@ def get_labels(clusters_dict, labels_of_interest=[], axis=0, direction='ltr'):
             if i not in d:
                 d[i] = []
                 d[i].append(cluster_label)
-            # Append another cluster label only if there's no
-            # overlap of the cluster's bounding
-            # box with others in the label set.
-            # One bounding box entirely within another is permitted
+            # Append another cluster label only if there's no overlap of the cluster's bounding
+            # box with others in the label set. One bounding box entirely within another is permitted
             else:
                 if not have_overlaps(cluster_label, d[i], clusters_dict, axis):
                     d[i].append(cluster_label)
@@ -688,8 +677,7 @@ def find_plural_marks(job_dict, width_threshold, height_threshold):
         heights.append(max(cluster[:, 1]) - min(cluster[:, 1]))
         cluster_labels.append(cluster_label)
 
-    # Normalise widths and heights to percentages and generate a points array.
-    # This way we get scale invariance
+    # Normalise widths and heights to percentages and generate a points array. This way we get scale invariance
     points = [[w, h] for (w, h) in list(
         zip([int(w) for w in (widths / max(widths)) *
              100], [int(h) for h in (heights / max(heights)) * 100]))]
@@ -711,11 +699,9 @@ def serialize_job_dictionary(job_dict):
 app = Flask(__name__)
 CORS(app)
 
-
 @app.route('/_ah/warmup')
 def warmup():
     return '', 200, {}
-
 
 @app.route('/clusteranalysis', methods=['POST'])
 @require_json(['image'])
@@ -767,6 +753,9 @@ def cluster_analysis(payload):
         else:
             result = do_cluster_analysis(image, direction)
         return jsonify(code=200, success=True, result=result)
+
+    except BadRequest as e:
+        raise BadRequest(e.description)
 
     except Exception as e:
         logging.error(e)
