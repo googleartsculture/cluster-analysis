@@ -25,6 +25,11 @@ instance_class: F4
 
 automatic_scaling:
   min_instances: {{MIN_INSTANCES}}
+  # The below will mean that at max * target will
+  # trigger a new instance to be scheduled
+  target_throughput_utilization: 0.5 # Default
+  max_concurrent_requests: 3
+
 
 inbound_services:
   - warmup
