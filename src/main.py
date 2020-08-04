@@ -30,6 +30,7 @@ from flask_cors import CORS
 from PIL import Image
 from PIL.PngImagePlugin import PngImageFile
 from scipy.spatial import ConvexHull
+from scipy.spatial.qhull import QhullError
 from sklearn.cluster import DBSCAN
 from werkzeug.exceptions import (BadRequest, Forbidden, HTTPException,
                                     InternalServerError)
@@ -44,6 +45,10 @@ PORT = os.environ.get('CLUSTER_SERVICE_PORT', '8080')
 DEBUG = os.environ.get('DEBUG', True)
 if DEBUG == 'False' or DEBUG == '0':
     DEBUG = False
+
+QHULL_ERROR_MESSAGE = 'Unable to process image do to pixel' + \
+    ' dimensions or geometrical degeneracy. Please use the ' + \
+    'marquee tool to refine your selection.'
 
 # Pixels limit
 pixel_limit = 50000
@@ -757,8 +762,12 @@ def cluster_analysis(payload):
     except BadRequest as e:
         raise BadRequest(e.description)
 
+    except QhullError as e:
+        raise BadRequest(QHULL_ERROR_MESSAGE)
+
     except Exception as e:
         logging.error(e)
+        logging.traceback.extract_tb(e)
         raise InternalServerError('Something went wrong!')
 
 
