@@ -280,6 +280,23 @@ class MainTests(TestbedTestCase):
             self.assertIn('height', cluster.get('bounds'))
             self.assertIn('width', cluster.get('bounds'))
 
+    def test_scipy_error_is_handled(self):
+        """
+        Asserts that a request with an image that causes
+        an error is handled (see Issue #13).
+        """
+        json_path = os.path.join(os.path.dirname(__file__),
+                                'scipy_error_request.json')
+        invalid = open(json_path)
+        payload = json.load(invalid)
+        response = self.client.post('/clusteranalysis', json=payload)
+        self.assertEqual('400 BAD REQUEST', response.status)
+        data = json.loads(response.data)
+        self.assertEqual(400, data.get('code'))
+        self.assertEqual(
+            main.QHULL_ERROR_MESSAGE,
+            data.get('message'))
+
     def test_warmup_request_responds_200(self):
         """
         Asserts that a reuqest to /_ah/warmup is handled.
