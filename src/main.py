@@ -766,8 +766,7 @@ def cluster_analysis(payload):
         raise BadRequest(QHULL_ERROR_MESSAGE)
 
     except Exception as e:
-        logging.error(e)
-        logging.traceback.extract_tb(e)
+        logging.exception(e)
         raise InternalServerError('Something went wrong!')
 
 
