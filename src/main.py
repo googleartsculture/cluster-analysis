@@ -431,7 +431,8 @@ def merge(job_dict, merge_dict, cartouche_list):
     param merge_dict: A dictionary defining clusters
     param cartouche_list: A list of cartouche dictionaries
     """
-    # Build a list of cartouche wrappers and frames so we don't merge cartouche inner clusters with their frames
+    # Build a list of cartouche wrappers and frames so we don't merge cartouche
+    # inner clusters with their frames
     cartouche_clusters = []
     for c in cartouche_list:
         cartouche_clusters = cartouche_clusters + c['wrapper']
@@ -441,18 +442,24 @@ def merge(job_dict, merge_dict, cartouche_list):
     for outer in merge_dict:
         if outer not in cartouche_clusters:
             for inner in merge_dict[outer]:
-                # We may have already processed our raw clusters so want to avoid a key error
+                # We may have already processed our raw clusters so want to
+                # avoid a key error
                 if outer in job_dict[
                         'clusters_processed'] and inner in job_dict[
                             'clusters_processed']:
-                    # Merge the 2 clusters and label with the name of the outer cluster then delete the inner cluster
+                    # Merge the 2 clusters and label with the name of the outer
+                    # cluster then delete the inner cluster
                     job_dict['clusters_processed'][outer] = merge_clusters(
                         job_dict['clusters_processed'][inner],
                         job_dict['clusters_processed'][outer])
                     pop_list.append(inner)
     # Remove the clusters that have been merged
     for inner in pop_list:
-        job_dict['clusters_processed'].pop(inner)
+        try:
+            job_dict['clusters_processed'].pop(inner)
+        except KeyError as e:
+            logging.info('The value inner may have already popped.')
+            logging.error(e)
 
 
 def merge_clusters(inner_cluster, outer_cluster):
