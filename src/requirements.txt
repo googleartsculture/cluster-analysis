@@ -25,7 +25,7 @@ pyparsing==2.4.7
 pytest==5.4.1
 pytest-mock==3.0.0
 scikit-learn==0.23.1
-scipy==1.4.1
+scipy==1.10.0
 six==1.14.0
 threadpoolctl==2.1.0
 wcwidth==0.1.9
